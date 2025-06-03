@@ -1,0 +1,55 @@
+///trying to define the minimal wit interface
+
+interface host-allocator {
+    #Using u32 for handles 
+type handle = u32;
+
+
+    // This is to allocate a raw buffer on the host and the guest is responsible for knowing what this buffer is for (e.g a matrix, its dimensions) and returns a handle to the allocated buffer or an error.
+    allocate-buffer: func(size: u64) -> result<handle, host-error>;
+
+    free-buffer: func(h: handle) -> result<_, host-error>;
+
+    // Copy data from Wasm linear memory (guest) to a host buffer, guest-bytes: The data to copy from wasm, target-handle for trhe handle of the destination host buffer and target-offset for the offset in the host buffer to start writing.
+    write-to-host: func(
+        guest-bytes: list<u8>,
+        target-handle: handle,
+        target-offset: u64
+    ) -> result<_, host-error>;
+
+    // Copy data from a host buffer to Wasm linear memory (guest), source-handle, source-offset( offset in the host buffer to start reading) and the len, return the number of bytes read.
+    
+    read-from-host: func(
+        source-handle: handle,
+        source-offset: u64,
+        len: u64
+    ) -> result<list<u8>, host-error>;
+
+  
+    //assuming matrices of f32, A and B are identified by their handles. The host is responsible for:
+      1. Knowing/retrieving dimensions associated with handle-a and handle-b.
+      2. Validating if they can be multiplied.
+      3. Performing the multiplication.
+      4. Allocating a new host buffer for the result matrix C.
+      5. Returning the handle for C.
+   ///////////////// 
+    matrix-multiply-f32: func(
+        handle-a: handle,
+        handle-b: handle
+    ) -> result<handle, host-error>; // Returns handle for C
+
+    //maybe a way to get info about a buffer, especially dimensions if it's a matrix, could be useful for the guest to know the dimensions of the result matrix C.
+    record matrix-dimensions {
+        rows: u32,
+        cols: u32,
+    }
+    get-matrix-dimensions: func(h: handle) -> result<matrix-dimensions, host-error>;
+}
+
+// Define the "world" for our component, it would describes what a component imports and exports. Our Wasm module will *import* the `host-allocator` interface.
+world offload-client {
+    import host-allocator;
+
+    // The Wasm module might export a function, e.g., to run a demo.
+    export run-matrix-example: func() -> result<_, string>; // Returns error string on failure
+}
