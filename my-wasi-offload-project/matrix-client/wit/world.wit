@@ -1,0 +1,8 @@
+package my-org:matrix-client-world@0.1.0;
+
+use wasi-custom:host-offload/0.1.0.{host-allocator as imported-host-allocator};
+
+world client {
+  import host-allocator: imported-host-allocator;
+  export run-matrix-example: func() -> result<_, string>;
+}

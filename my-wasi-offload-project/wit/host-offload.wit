@@ -1,0 +1,53 @@
+// wasi-offload-intercomponent-test/wit/host-offload.wit
+package wasi-custom:host-offload@0.1.0;
+
+interface host-allocator {
+    type handle = u32;
+
+    variant host-error {
+        invalid-handle,
+        allocation-failed,
+        copy-out-of-bounds,
+        computation-error(string),
+        dimension-mismatch,
+        other(string)
+    }
+
+    allocate-buffer: func(size: u64) -> result<handle, host-error>;
+    free-buffer: func(h: handle) -> result<_, host-error>;
+    write-to-host: func(
+        guest-bytes: list<u8>,
+        target-handle: handle,
+        target-offset: u64
+    ) -> result<_, host-error>;
+    read-from-host: func(
+        source-handle: handle,
+        source-offset: u64,
+        len: u64
+    ) -> result<list<u8>, host-error>;
+
+    record matrix-dimensions {
+        rows: u32,
+        cols: u32,
+    }
+
+    // We need a way to associate dimensions with a handle when it's created or written to.
+    // Let's add an explicit function for the provider to register dimensions
+    // after data is written, or make allocate_buffer more specific if it's for matrices.
+    // For now, let's add `register-matrix-dimensions`
+    register-matrix-dimensions: func(h: handle, dims: matrix-dimensions) -> result<_, host-error>;
+
+    matrix-multiply-f32: func(
+        handle-a: handle,
+        handle-b: handle
+    ) -> result<handle, host-error>;
+
+    get-matrix-dimensions: func(h: handle) -> result<matrix-dimensions, host-error>;
+}
+
+// This world was for a client that imports the host-allocator.
+// We will define separate worlds for our provider and client components.
+// So, the `world offload-client` definition can be removed from this central file
+// or kept for reference if you later build a component that exactly matches that world.
+// For clarity in this inter-component test, let's remove it from here
+// and define specific worlds in each component's `wit` directory.

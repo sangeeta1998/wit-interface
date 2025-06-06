@@ -1,0 +1,20 @@
+[package]
+name = "host-offload-provider"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"] # Important for Wasm components
+
+[dependencies]
+wit-bindgen = { version = "0.20.0", features = ["macros"] } # For generating bindings
+nalgebra = "0.32"         # For matrix math (provider does the multiplication)
+once_cell = "1.18"        # For static mutable state
+
+[package.metadata.component]
+package = "my-org:host-simulation-world" # Name of the package in wit/world.wit
+
+[package.metadata.component.target]
+path = "wit/world.wit"
+[package.metadata.component.dependencies]
+"wasi-custom:host-offload" = { path = "../wit/host-offload.wit" }
