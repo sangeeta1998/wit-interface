@@ -2,21 +2,12 @@ use std::collections::HashMap;
 use std::sync::Mutex;
 use once_cell::sync::Lazy; // For thread-safe static initialization
 
-// Import the generated bindings for the `provider` world.
-// The name of the module `provider` matches the world name in `wit/world.wit`.
-wit_bindgen::generate!({
-    world: "provider", // Name of the world in wit/world.wit
-    path: "wit/world.wit", // Path to the main WIT definition for this component
-    // We need to tell bindgen where to find the `wasi-custom:host-offload` package
-    // that our `provider` world's interface uses.
-    // `generate!` macro can take `additional_packages` or rely on `cargo-component` to provide it.
-    // cargo-component uses the [package.metadata.component.dependencies] for this.
-});
+#[allow(warnings)]
+mod bindings;
 
-use crate::wasi_custom::host_offload::host_allocator::{
-    Handle, HostError, MatrixDimensions
-};
+use bindings::exports::wasi_custom::host_offload::host_allocator::Guest;
 
+use bindings::exports::wasi_custom::host_offload::host_allocator::{Handle, HostError, MatrixDimensions};
 
 // Simulated host state
 struct HostState {
@@ -48,7 +39,7 @@ static HOST_STATE: Lazy<Mutex<HostState>> = Lazy::new(|| Mutex::new(HostState::n
 //
 struct Component;
 
-impl crate::provider::exports::HostAllocator for Component {
+impl Guest for Component {
     fn allocate_buffer(size: u64) -> Result<Handle, HostError> {
         println!("[Provider Wasm] Allocating buffer of size {}", size);
         if size == 0 {
@@ -112,7 +103,7 @@ impl crate::provider::exports::HostAllocator for Component {
         }
     }
 
-    fn register_matrix_dimensions(h: Handle, dims: crate::wasi_custom::host_offload::host_allocator::MatrixDimensions) -> Result<(), HostError> {
+    fn register_matrix_dimensions(h: Handle, dims: MatrixDimensions) -> Result<(), HostError> {
         println!("[Provider Wasm] Registering dimensions {}x{} for handle {}", dims.rows, dims.cols, h);
         let mut state = HOST_STATE.lock().unwrap();
         if !state.buffers.contains_key(&h) {
@@ -157,7 +148,7 @@ impl crate::provider::exports::HostAllocator for Component {
         Ok(handle_c)
     }
 
-    fn get_matrix_dimensions(h: Handle) -> Result<crate::wasi_custom::host_offload::host_allocator::MatrixDimensions, HostError> {
+    fn get_matrix_dimensions(h: Handle) -> Result<MatrixDimensions, HostError> {
         println!("[Provider Wasm] Getting dimensions for handle {}", h);
         let state = HOST_STATE.lock().unwrap();
         match state.matrix_dims.get(&h) {
@@ -187,4 +178,6 @@ fn f32_slice_to_bytes(floats: &[f32]) -> Vec<u8> {
     bytes
 }
 
-bindings::export!(Component with_โลก_world ()); // This macro binds the `Component` struct to the world exports. The name after `with_` needs to be the snake_case of the world name.
+
+bindings::export!(Component with_types_in bindings); 
+
