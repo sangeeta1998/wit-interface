@@ -18,5 +18,4 @@ package = "wasi-custom:host-offload"
 [package.metadata.component.target]
 path = "wit"
 world = "provider"
-[package.metadata.component.dependencies]
-"wasi-custom:host-offload" = { path = "../wit/host-offload.wit" }
+
