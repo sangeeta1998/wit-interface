@@ -3,10 +3,16 @@ mod bindings;
 
 
 use bindings::Guest;
-use bindings::wasi_custom::host_offload::host_allocator;
-
-use crate::bindings::wasi_custom::host_offload::host_allocator::MatrixDimensions;
-
+use bindings::wasi_custom::host_offload::host_allocator::{
+    MatrixDimensions, 
+    allocate_buffer,
+    write_to_host,
+    read_from_host,
+    free_buffer,
+    register_matrix_dimensions,
+    get_matrix_dimensions,
+    matrix_multiply_f32,
+};
 
 // Define the component that implements the Guest trait.
 struct Component;
@@ -30,42 +36,42 @@ impl Guest for Component {
         let b_bytes = f32_vec_to_bytes(&b_data);
 
         // 1. Allocate host buffers
-        let handle_a = host_allocator::allocate_buffer(a_bytes.len() as u64)
+        let handle_a = allocate_buffer(a_bytes.len() as u64)
             .map_err(|e| format!("Failed to allocate for A: {:?}", e))?;
         println!("[Client Wasm] Allocated A, handle: {}", handle_a);
 
-        let handle_b = host_allocator::allocate_buffer(b_bytes.len() as u64)
+        let handle_b = allocate_buffer(b_bytes.len() as u64)
             .map_err(|e| format!("Failed to allocate for B: {:?}", e))?;
         println!("[Client Wasm] Allocated B, handle: {}", handle_b);
 
         // 2. Write data to host buffers
-        host_allocator::write_to_host(&a_bytes, handle_a, 0)
+        write_to_host(&a_bytes, handle_a, 0)
             .map_err(|e| format!("Failed to write A: {:?}", e))?;
         println!("[Client Wasm] Wrote A data to host");
-        host_allocator::register_matrix_dimensions(handle_a, dims_a)
+        register_matrix_dimensions(handle_a, dims_a)
              .map_err(|e| format!("Failed to register dims A: {:?}", e))?;
         println!("[Client Wasm] Registered A dimensions");
 
 
-        host_allocator::write_to_host(&b_bytes, handle_b, 0)
+        write_to_host(&b_bytes, handle_b, 0)
             .map_err(|e| format!("Failed to write B: {:?}", e))?;
         println!("[Client Wasm] Wrote B data to host");
-        host_allocator::register_matrix_dimensions(handle_b, dims_b)
+        register_matrix_dimensions(handle_b, dims_b)
              .map_err(|e| format!("Failed to register dims B: {:?}", e))?;
         println!("[Client Wasm] Registered B dimensions");
 
         // 3. Perform matrix multiplication
-        let handle_c = host_allocator::matrix_multiply_f32(handle_a, handle_b)
+        let handle_c = matrix_multiply_f32(handle_a, handle_b)
             .map_err(|e| format!("Matrix multiplication failed: {:?}", e))?;
         println!("[Client Wasm] Matrix multiplication done. Result C handle: {}", handle_c);
 
         // 4. Get dimensions of C and read C back
-        let dims_c = host_allocator::get_matrix_dimensions(handle_c)
+        let dims_c = get_matrix_dimensions(handle_c)
             .map_err(|e| format!("Failed to get C dimensions: {:?}", e))?;
         println!("[Client Wasm] Got C dimensions: {}x{}", dims_c.rows, dims_c.cols);
 
         let c_byte_len = (dims_c.rows * dims_c.cols * std::mem::size_of::<f32>() as u32) as u64;
-        let c_bytes = host_allocator::read_from_host(handle_c, 0, c_byte_len)
+        let c_bytes = read_from_host(handle_c, 0, c_byte_len)
             .map_err(|e| format!("Failed to read C: {:?}", e))?;
         println!("[Client Wasm] Read C data from host ({} bytes)", c_bytes.len());
 
@@ -81,9 +87,9 @@ impl Guest for Component {
         }
 
         // 5. Free host buffers
-        host_allocator::free_buffer(handle_a).map_err(|e| format!("Failed to free A: {:?}", e))?;
-        host_allocator::free_buffer(handle_b).map_err(|e| format!("Failed to free B: {:?}", e))?;
-        host_allocator::free_buffer(handle_c).map_err(|e| format!("Failed to free C: {:?}", e))?;
+        free_buffer(handle_a).map_err(|e| format!("Failed to free A: {:?}", e))?;
+        free_buffer(handle_b).map_err(|e| format!("Failed to free B: {:?}", e))?;
+        free_buffer(handle_c).map_err(|e| format!("Failed to free C: {:?}", e))?;
         println!("[Client Wasm] Freed all handles.");
 
         Ok(())
