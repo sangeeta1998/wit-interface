@@ -1,0 +1,6 @@
+package my-org:matrix-client-world@0.1.0;
+
+world client {
+  import wasi:acc/host-allocator@0.2.0-draft;
+  export run-matrix-example: func() -> result<_, string>;
+}

@@ -1,0 +1,61 @@
+package wasi:acc@0.2.0-draft;
+
+interface host-allocator {
+    type handle = u32;
+
+    variant host-error {
+        invalid-handle,
+        allocation-failed,
+        copy-out-of-bounds,
+        computation-error(string),
+        dimension-mismatch,
+        other(string)
+    }
+
+    allocate-buffer: func(size: u64) -> result<handle, host-error>;
+    free-buffer: func(h: handle) -> result<_, host-error>;
+    write-to-host: func(
+        guest-bytes: list<u8>,
+        target-handle: handle,
+        target-offset: u64
+    ) -> result<_, host-error>;
+    read-from-host: func(
+        source-handle: handle,
+        source-offset: u64,
+        len: u64
+    ) -> result<list<u8>, host-error>;
+
+    record matrix-dimensions {
+        rows: u32,
+        cols: u32,
+    }
+
+    // We need a way to associate dimensions with a handle when it's created or written to.
+    // Let's add an explicit function for the provider to register dimensions
+    // after data is written, or make allocate_buffer more specific if it's for matrices.
+    // For now, let's add `register-matrix-dimensions`
+    register-matrix-dimensions: func(h: handle, dims: matrix-dimensions) -> result<_, host-error>;
+
+    matrix-multiply-f32: func(
+        handle-a: handle,
+        handle-b: handle
+    ) -> result<handle, host-error>;
+
+    get-matrix-dimensions: func(h: handle) -> result<matrix-dimensions, host-error>;
+}
+
+world imports {
+  // The `wasi:acc/imports` world provides common APIs for interacting with host-allocated buffers
+  // Components targeting this world will be able to do:
+  //
+  // 1. Allocate and free buffers in the host memory.
+  // 2. Read from and write to these buffers.
+  // 3. Perform matrix operations like multiplication.
+  //
+  // Components can use these APIs to interact with host-allocated buffers, which can be used
+  // for various purposes, such as passing data between components or performing computations.
+
+  import host-allocator;
+}
+
+
