@@ -1,0 +1,8 @@
+package snt:kv-test@0.1.0;
+
+world client {
+  import wasi:keyvalue/store@0.2.0-draft;
+  import wasi:keyvalue/batch@0.2.0-draft;
+  import wasi:keyvalue/atomics@0.2.0-draft;
+  export run-kv-example: func() -> result<_, string>;
+}

@@ -1,0 +1,1 @@
+/home/mats/wasm/wit-interface/matrix-client/target/wasm32-wasip2/debug/matrix_client.wasm: /home/mats/wasm/wit-interface/matrix-client/src/bindings.rs /home/mats/wasm/wit-interface/matrix-client/src/lib.rs

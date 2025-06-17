@@ -10,11 +10,11 @@ crate-type = ["cdylib"]
 wit-bindgen-rt = { version = "0.42.1", features = ["bitflags"] }
 
 [package.metadata.component]
-package = "my-org:matrix-client-world" # Package name from client/wit/world.wit
+package = "snt:kv-test" # Package name from wit/world.wit
 
 [package.metadata.component.target]
 path = "wit"
 world = "client"
 
 [package.metadata.component.target.dependencies]
-"wasi:acc" = { path = "wit/wasi-acc" }
+"wasi:keyvalue" = { path = "wit/keyvalue" }
