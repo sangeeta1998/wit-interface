@@ -62,7 +62,7 @@ static mut _RET_AREA: _RetArea = _RetArea(
 #[rustfmt::skip]
 #[allow(dead_code, clippy::all)]
 pub mod wasi {
-    pub mod acc {
+    pub mod accelerator {
         #[allow(dead_code, async_fn_in_trait, unused_imports, clippy::all)]
         pub mod host_allocator {
             #[used]
@@ -150,7 +150,9 @@ pub mod wasi {
                     );
                     let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:acc/host-allocator@0.2.0-draft")]
+                    #[link(
+                        wasm_import_module = "wasi:accelerator/host-allocator@0.2.0-draft"
+                    )]
                     unsafe extern "C" {
                         #[link_name = "allocate-buffer"]
                         fn wit_import1(_: i64, _: *mut u8);
@@ -244,7 +246,9 @@ pub mod wasi {
                     );
                     let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:acc/host-allocator@0.2.0-draft")]
+                    #[link(
+                        wasm_import_module = "wasi:accelerator/host-allocator@0.2.0-draft"
+                    )]
                     unsafe extern "C" {
                         #[link_name = "free-buffer"]
                         fn wit_import1(_: i32, _: *mut u8);
@@ -340,7 +344,9 @@ pub mod wasi {
                     let len0 = vec0.len();
                     let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:acc/host-allocator@0.2.0-draft")]
+                    #[link(
+                        wasm_import_module = "wasi:accelerator/host-allocator@0.2.0-draft"
+                    )]
                     unsafe extern "C" {
                         #[link_name = "write-to-host"]
                         fn wit_import2(_: *mut u8, _: usize, _: i32, _: i64, _: *mut u8);
@@ -447,7 +453,9 @@ pub mod wasi {
                     );
                     let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:acc/host-allocator@0.2.0-draft")]
+                    #[link(
+                        wasm_import_module = "wasi:accelerator/host-allocator@0.2.0-draft"
+                    )]
                     unsafe extern "C" {
                         #[link_name = "read-from-host"]
                         fn wit_import1(_: i32, _: i64, _: i64, _: *mut u8);
@@ -565,7 +573,9 @@ pub mod wasi {
                     let MatrixDimensions { rows: rows0, cols: cols0 } = dims;
                     let ptr1 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:acc/host-allocator@0.2.0-draft")]
+                    #[link(
+                        wasm_import_module = "wasi:accelerator/host-allocator@0.2.0-draft"
+                    )]
                     unsafe extern "C" {
                         #[link_name = "register-matrix-dimensions"]
                         fn wit_import2(_: i32, _: i32, _: i32, _: *mut u8);
@@ -669,7 +679,9 @@ pub mod wasi {
                     );
                     let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:acc/host-allocator@0.2.0-draft")]
+                    #[link(
+                        wasm_import_module = "wasi:accelerator/host-allocator@0.2.0-draft"
+                    )]
                     unsafe extern "C" {
                         #[link_name = "matrix-multiply-f32"]
                         fn wit_import1(_: i32, _: i32, _: *mut u8);
@@ -767,7 +779,9 @@ pub mod wasi {
                     );
                     let ptr0 = ret_area.0.as_mut_ptr().cast::<u8>();
                     #[cfg(target_arch = "wasm32")]
-                    #[link(wasm_import_module = "wasi:acc/host-allocator@0.2.0-draft")]
+                    #[link(
+                        wasm_import_module = "wasi:accelerator/host-allocator@0.2.0-draft"
+                    )]
                     unsafe extern "C" {
                         #[link_name = "get-matrix-dimensions"]
                         fn wit_import1(_: i32, _: *mut u8);
@@ -1004,8 +1018,8 @@ pub(crate) use __export_client_impl as export;
 )]
 #[doc(hidden)]
 #[allow(clippy::octal_escapes)]
-pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 765] = *b"\
-\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x80\x05\x01A\x02\x01\
+pub static __WIT_BINDGEN_COMPONENT_TYPE: [u8; 773] = *b"\
+\0asm\x0d\0\x01\0\0\x19\x16wit-component-encoding\x04\0\x07\x88\x05\x01A\x02\x01\
 A\x05\x01B\x19\x01y\x04\0\x06handle\x03\0\0\x01q\x06\x0einvalid-handle\0\0\x11al\
 location-failed\0\0\x12copy-out-of-bounds\0\0\x11computation-error\x01s\0\x12dim\
 ension-mismatch\0\0\x05other\x01s\0\x04\0\x0ahost-error\x03\0\x02\x01r\x02\x04ro\
@@ -1017,10 +1031,10 @@ sizew\0\x06\x04\0\x0fallocate-buffer\x01\x07\x01j\0\x01\x03\x01@\x01\x01h\x01\0\
 m-host\x01\x0d\x01@\x02\x01h\x01\x04dims\x05\0\x08\x04\0\x1aregister-matrix-dime\
 nsions\x01\x0e\x01@\x02\x08handle-a\x01\x08handle-b\x01\0\x06\x04\0\x13matrix-mu\
 ltiply-f32\x01\x0f\x01j\x01\x05\x01\x03\x01@\x01\x01h\x01\0\x10\x04\0\x15get-mat\
-rix-dimensions\x01\x11\x03\0#wasi:acc/host-allocator@0.2.0-draft\x05\0\x01j\0\x01\
-s\x01@\0\0\x01\x04\0\x12run-matrix-example\x01\x02\x04\0'my-org:matrix-client-wo\
-rld/client@0.1.0\x04\0\x0b\x0c\x01\0\x06client\x03\0\0\0G\x09producers\x01\x0cpr\
-ocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41.0";
+rix-dimensions\x01\x11\x03\0+wasi:accelerator/host-allocator@0.2.0-draft\x05\0\x01\
+j\0\x01s\x01@\0\0\x01\x04\0\x12run-matrix-example\x01\x02\x04\0'my-org:matrix-cl\
+ient-world/client@0.1.0\x04\0\x0b\x0c\x01\0\x06client\x03\0\0\0G\x09producers\x01\
+\x0cprocessed-by\x02\x0dwit-component\x070.227.1\x10wit-bindgen-rust\x060.41.0";
 #[inline(never)]
 #[doc(hidden)]
 pub fn __link_custom_section_describing_imports() {

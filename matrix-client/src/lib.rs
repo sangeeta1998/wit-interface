@@ -1,9 +1,9 @@
-#[allow(warnings)]
+ #[allow(warnings)]
 mod bindings;
 
 
 use bindings::Guest;
-use bindings::wasi::acc::host_allocator::{
+use bindings::wasi::accelerator::host_allocator::{
     MatrixDimensions, 
     allocate_buffer,
     write_to_host,
