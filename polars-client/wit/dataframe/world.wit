@@ -1,0 +1,40 @@
+package wasi:dataframe@0.2.0-draft;
+
+interface dataframe-analysis {
+	// Opaque handle to a dataframe/lazyframe on the host
+	type dataframe = u32;
+
+	// Comparators for filters
+	enum comparator { gt, gte, lt, lte, eq, neq }
+
+	// Simple scalar values used in filters
+	variant scalar {
+		logic(bool),
+		name(string),
+		value(f64),
+	}
+
+	record column-filter {
+		column: string,
+		op: comparator,
+		value: scalar,
+	}
+
+	// Aggregation functions
+	enum aggregation {
+		count,
+		mean,
+	}
+
+	// --- The API ---
+	load-csv: func(path: string) -> result<dataframe>;
+	from-rows: func(columns: list<string>, rows: list<list<string>>) -> result<dataframe>;
+	filter: func(df: dataframe, filters: list<column-filter>) -> result<dataframe>;
+	group-by: func(df: dataframe, by-columns: list<string>) -> result<dataframe>;
+	aggregate: func(df: dataframe, aggs: list<aggregation>) -> result<dataframe>;
+	to-json: func(df: dataframe) -> result<string>;
+}
+
+world imports {
+  import dataframe-analysis;
+}

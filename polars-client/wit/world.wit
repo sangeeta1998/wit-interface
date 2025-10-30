@@ -1,0 +1,6 @@
+package my-org:dataframe-world@0.1.0;
+
+world client {
+  import wasi:dataframe/dataframe-analysis@0.2.0-draft;
+  export run-dataframe-example: func() -> result<_, string>;
+}
